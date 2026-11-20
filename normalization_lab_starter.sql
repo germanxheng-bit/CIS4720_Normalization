@@ -137,12 +137,14 @@ LEFT JOIN pet p ON o.owner_id = p.owner_id
 */
 
 /* Step 3  CREATE */
+-- Create the building table with building_id as the primary key and columns for building name and address.
 CREATE TABLE building (
     building_id VARCHAR(5) PRIMARY KEY,
     building_name VARCHAR(50) NOT NULL,
     building_address VARCHAR(100) NOT NULL
 ); 
 
+-- Create the apartment_unit table with a composite primary key consisting of building_id and unit_number, and establish a foreign key relationship to the building table.
 CREATE TABLE apartment_unit (
     building_id VARCHAR(5),
     unit_number INT,
@@ -153,16 +155,19 @@ CREATE TABLE apartment_unit (
 );
 
 /* Step 4  INSERT */
+-- Insert sample data into the building table.
 INSERT INTO building (building_id, building_name, building_address) VALUES
 ('B1', 'Oak Terrace', '100 Oak St'),
 ('B2', 'Canal Court', '45 Canal Dr');
 
+-- Insert sample data into the apartment_unit table, associating each unit with its respective building and providing details about the number of bedrooms and monthly rent.
 INSERT INTO apartment_unit (building_id, unit_number, bedrooms, monthly_rent) VALUES
 ('B1', 101, 1, 1250.00),
 ('B1', 102, 2, 1600.00),
 ('B2', 101, 2, 1550.00),
 ('B2', 201, 3, 1900.00);
 /* Step 5  JOIN */
+-- Join the building and apartment_unit tables to display each building's information along with its apartment units' details.
 SELECT b.building_id, b.building_name, b.building_address, u.unit_number, u.bedrooms, u.monthly_rent
 FROM building b
 JOIN apartment_unit u ON b.building_id = u.building_id
@@ -201,12 +206,14 @@ JOIN apartment_unit u ON b.building_id = u.building_id
 */
 
 /* Step 3  CREATE */
+-- Create the department table with dept_id as the primary key and columns for department name and phone number.
 CREATE table department (
     dept_id VARCHAR(5) PRIMARY KEY,
     dept_name VARCHAR(50) NOT NULL,
     dept_phone VARCHAR(15) NOT NULL
 ); 
 
+-- Create the employee table with emp_id as the primary key and dept_id as a foreign key referencing the department table.
 CREATE table employee (
     emp_id VARCHAR(5) PRIMARY KEY,
     emp_name VARCHAR(50) NOT NULL,
@@ -216,10 +223,12 @@ CREATE table employee (
 );
 
 /* Step 4  INSERT */
+-- Insert sample data into the department table.
 INSERT INTO department (dept_id, dept_name, dept_phone) VALUES
 ('D10', 'Accounting', '209.555.0300'),
 ('D20', 'Marketing', '209.555.0400');
 
+-- The employee table is populated with employees, their hire years, and the department they belong to, referencing the department table for department details.  
 INSERT INTO employee (emp_id, emp_name, hire_year, dept_id) VALUES
 ('E01', 'Linda Park', 2019, 'D10'),
 ('E02', 'Raj Mehta', 2021, 'D20'),
@@ -227,6 +236,7 @@ INSERT INTO employee (emp_id, emp_name, hire_year, dept_id) VALUES
 ('E04', 'Emma Wilson', 2024, 'D20');
 
 /* Step 5  JOIN */
+-- Join the employee and department tables to display each employee's information along with their department details.
 SELECT e.emp_id, e.emp_name, e.hire_year, d.dept_id, d.dept_name, d.dept_phone
 FROM employee e
 JOIN department d ON e.dept_id = d.dept_id
@@ -274,12 +284,14 @@ JOIN department d ON e.dept_id = d.dept_id
 */
 
 /* Step 3  CREATE */
+-- Create the student table with student_id as the primary key and columns for student name and major.
 CREATE TABLE student (
     student_id VARCHAR(10) PRIMARY KEY,
     student_name VARCHAR(50) NOT NULL,
     student_major VARCHAR(50) NOT NULL
 );
 
+-- Create the course table with course_id as the primary key and columns for course name, description, and units.
 CREATE TABLE course (
     course_id VARCHAR(10) PRIMARY KEY,
     course_name VARCHAR(50) NOT NULL,
@@ -287,6 +299,7 @@ CREATE TABLE course (
     units INT NOT NULL
 );
 
+-- Create the enrollment table with a composite primary key consisting of student_id and course_id, and establish foreign key relationships to the student and course tables.
 CREATE TABLE enrollment (
     student_id VARCHAR(10),
     course_id VARCHAR(10),
@@ -299,15 +312,18 @@ CREATE TABLE enrollment (
 /* Step 4  INSERT
    Enroll at least one student in two courses, and put at least two
    students in the same course, so the many to many relationship shows. */
+-- Insert sample data into the student table.
 INSERT INTO student (student_id, student_name, student_major) VALUES
 ('S100', 'Ana Torres', 'CIS'),
 ('S200', 'Ben Shah', 'Business'),
 ('S300', 'Chloe Nguyen', 'CIS');
 
+-- The course table is populated with courses offered by the college, including their descriptions and unit values.
 INSERT INTO course (course_id, course_name, course_description, units) VALUES
 ('CIS4720', 'Database Mgmt', 'Relational design and SQL', 3),
 ('CIS2000', 'Intro to Python', 'Programming fundamentals in Python', 3);
 
+-- The enrollment table is populated with students enrolled in courses along with their grades.
 INSERT INTO enrollment (student_id, course_id, grade) VALUES
 ('S100', 'CIS4720', 'A'),
 ('S100', 'CIS2000', 'B'),
@@ -315,6 +331,7 @@ INSERT INTO enrollment (student_id, course_id, grade) VALUES
 ('S300', 'CIS2000', 'A');
 
 /* Step 5  JOIN  (three tables: student, enrollment, course) */
+-- Join the student, enrollment, and course tables to display each student's information along with their enrolled courses and grades.
 SELECT s.student_id, s.student_name, s.student_major, c.course_id, c.course_name, c.course_description, c.units, e.grade
 FROM enrollment e
 JOIN student s ON e.student_id = s.student_id
