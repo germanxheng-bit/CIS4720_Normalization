@@ -201,13 +201,35 @@ JOIN apartment_unit u ON b.building_id = u.building_id
 */
 
 /* Step 3  CREATE */
+CREATE table department (
+    dept_id VARCHAR(5) PRIMARY KEY,
+    dept_name VARCHAR(50) NOT NULL,
+    dept_phone VARCHAR(15) NOT NULL
+); 
 
+CREATE table employee (
+    emp_id VARCHAR(5) PRIMARY KEY,
+    emp_name VARCHAR(50) NOT NULL,
+    hire_year INT NOT NULL,
+    dept_id VARCHAR(5) NOT NULL,
+    FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+);
 
 /* Step 4  INSERT */
+INSERT INTO department (dept_id, dept_name, dept_phone) VALUES
+('D10', 'Accounting', '209.555.0300'),
+('D20', 'Marketing', '209.555.0400');
 
+INSERT INTO employee (emp_id, emp_name, hire_year, dept_id) VALUES
+('E01', 'Linda Park', 2019, 'D10'),
+('E02', 'Raj Mehta', 2021, 'D20'),
+('E03', 'Carlos Vega', 2022, 'D10'),
+('E04', 'Emma Wilson', 2024, 'D20');
 
 /* Step 5  JOIN */
-
+SELECT e.emp_id, e.emp_name, e.hire_year, d.dept_id, d.dept_name, d.dept_phone
+FROM employee e
+JOIN department d ON e.dept_id = d.dept_id
 
 
 /* ================================================================
@@ -232,9 +254,9 @@ JOIN apartment_unit u ON b.building_id = u.building_id
    S300       | Chloe Nguyen | CIS           | CIS2000   | Intro to Python    | Programming fundamentals in Python | 3     | A
 
    Questions to think about:
-     Which columns describe only the STUDENT?
-     Which columns describe only the COURSE?
-     Which column describes "this student in this course"?
+     Which columns describe only the STUDENT? student_id, student_name, student_major
+     Which columns describe only the COURSE? course_id, course_name, course_description, units
+     Which column describes "this student in this course"? grade
 
    Use these table names:  student, course, enrollment
    enrollment is the bridge table. Its primary key must be the
@@ -242,19 +264,58 @@ JOIN apartment_unit u ON b.building_id = u.building_id
    must also be a foreign key.
 
    Step 1  DIAGNOSE:
-
+-- The student_course table breaks Second Normal Form (2NF) because its natural primary key is the composite key (student_id, course_id). The columns student_name and student_major depend only on student_id, while course_name, course_description, and units depend only on course_id. Therefore, these columns have partial dependencies and should be moved to separate tables for students and courses.
 
    Step 2  DESIGN:
-
+-- student table: student_id (PK), student_name, student_major
+-- course table: course_id (PK), course_name, course_description, units
+-- enrollment table: student_id (PK, FK) references student(student_id), course_id (PK, FK) references course(course_id), grade
 
 */
 
 /* Step 3  CREATE */
+CREATE TABLE student (
+    student_id VARCHAR(10) PRIMARY KEY,
+    student_name VARCHAR(50) NOT NULL,
+    student_major VARCHAR(50) NOT NULL
+);
 
+CREATE TABLE course (
+    course_id VARCHAR(10) PRIMARY KEY,
+    course_name VARCHAR(50) NOT NULL,
+    course_description VARCHAR(100) NOT NULL,
+    units INT NOT NULL
+);
+
+CREATE TABLE enrollment (
+    student_id VARCHAR(10),
+    course_id VARCHAR(10),
+    grade CHAR(2),
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES student(student_id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
 
 /* Step 4  INSERT
    Enroll at least one student in two courses, and put at least two
    students in the same course, so the many to many relationship shows. */
+INSERT INTO student (student_id, student_name, student_major) VALUES
+('S100', 'Ana Torres', 'CIS'),
+('S200', 'Ben Shah', 'Business'),
+('S300', 'Chloe Nguyen', 'CIS');
 
+INSERT INTO course (course_id, course_name, course_description, units) VALUES
+('CIS4720', 'Database Mgmt', 'Relational design and SQL', 3),
+('CIS2000', 'Intro to Python', 'Programming fundamentals in Python', 3);
+
+INSERT INTO enrollment (student_id, course_id, grade) VALUES
+('S100', 'CIS4720', 'A'),
+('S100', 'CIS2000', 'B'),
+('S200', 'CIS4720', 'B'),
+('S300', 'CIS2000', 'A');
 
 /* Step 5  JOIN  (three tables: student, enrollment, course) */
+SELECT s.student_id, s.student_name, s.student_major, c.course_id, c.course_name, c.course_description, c.units, e.grade
+FROM enrollment e
+JOIN student s ON e.student_id = s.student_id
+JOIN course c ON e.course_id = c.course_id
